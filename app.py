@@ -11,21 +11,22 @@ bot = Bot(PAGE_ACCESS_TOKEN)
 
 VERIFICATION_TOKEN = "Sl33pyW00ly"
 
-GREETINGS = ['Is anyone available to chat?', 'Hey', 'hey', 'Hi', 'hi', 'hello', 'good afternoon', 'i have a question']
-
+GREETINGS = ['Is anyone available to chat?', 'Hey', 'hey', 'Hi', 'hi', 'hello', 'Hello', 'good afternoon', 'i have a question']
 
 buttons = [
     {
-        'YEARS':["Year 1", "Year 2", "Year 3", "Final Year"],
-        'payload': 1
+        'response': ['Yes', 'No'],
+        'payload': '0'
+    },    
+    {
+        'YEARS':["1st Year", "2nd Year", "3rd Year", "Final Year"],
+        'payload': '1'
     },
     {
-        'MAJORS':["Computer Science", "Social Sciences", "Medicine", "Pharmacy" "Any"],
-        'payload': 2
+        'MAJORS':["Computer Science", "Social Sciences", "Medicine", "Any"],
+        'payload': '2'
     }
-
 ]
-
 
 @app.route('/', methods=['GET'])
 def verify():
@@ -39,7 +40,12 @@ def verify():
 
 def getstarted():
     headers = {'Content-Type': 'application/json'}
-    data = json.dumps({"get_started": {"payload": "GET_STARTED_PAYLOAD"}})
+    data = json.dumps({
+        "get_started": {
+            "payload": "GET_STARTED_PAYLOAD"
+            }
+    })
+
     r = requests.post('https://graph.facebook.com/v7.0/me/messenger_profile?access_token='+ PAGE_ACCESS_TOKEN, headers=headers, data=data)
 
 @app.route('/', methods=['POST'])
@@ -55,7 +61,6 @@ def webhook():
 			
         for messaging_event in messaging:
             sender_psid = messaging_event['sender']['id']
-            recipient_psid = messaging_event['recipient']['id']
 
         #Handles messages events
         if messaging_event.get('message'):
@@ -74,114 +79,134 @@ def handleMessage(sender_psid, received_message):
     response = {}
 
     if ('quick_reply' in received_message.keys()):
-            payload = received_message['quick_reply']['payload']
-            response_message = received_message['text']
-            if payload == buttons[0]['payload']:
-                years = received_message
-                response = {
-                    "attachment": {
-                        "type":"template",
-                        "payload": {
-                            "template_type":"generic",
-                            "elements":[
-                                {
-                                    "title":"University of Technology",
-                                    "image_url":"https://www.utech.edu.jm/about-utech/utech.jpg",
-                                    "subtitle":"UTech",
-                                    "default_action": {
-                                        "type": "postback",
-                                        "payload": "matchUtech",
-                                        "messenger_extensions": False,
-                                        "webview_height_ratio": "COMPACT"
+        payload = received_message['quick_reply']['payload']
+        response_message = received_message['text']
+        if (payload == buttons[1]['payload']):
+            years = received_message
+            response = {
+                "text": "That's great. We have a few listings here.."
+            }
+            callSendAPI(sender_psid, response)
+            response = {
+                "attachment": {
+                    "type":"template",
+                    "payload": {
+                        "template_type":"generic",
+                        "elements":[
+                            {
+                                "title":"University of Technology",
+                                "image_url":"https://www.utech.edu.jm/about-utech/utech.jpg",
+                                "subtitle":"Utech",
+                                "buttons":[
+                                    {
+                                        "type":"web_url",
+                                        "url":"https://www.utech.edu.jm/admissions/dsf/financial-aid/scholarships/scholarships-listing",
+                                        "title":"Full Listing",
+                                        "webview_height_ratio": "full",
+                                        "messenger_extensions": "true",  
+                                        "fallback_url": "https://www.utech.edu.jm/admissions/dsf/financial-aid/scholarships/scholarships-listing"
                                     },
-                                    "buttons":[
-                                        {
-                                            "type":"web_url",
-                                            "url":"https://www.marriott.com/hotels/travel/sdqds-sheraton-santo-domingo-hotel/?scid=bb1a189a-fec3-4d19-a255-54ba596febe2&y_source=1_Mjg2ODk3OC03MTUtbG9jYXRpb24uZ29vZ2xlX3dlYnNpdGVfb3ZlcnJpZGU=",
-                                            "title":"Full Listing"
-                                        },
-                                        {
-                                            "type": "postback",
-                                            "title": "Find your match",
-                                            "payload": "matchUtech"
-                                        }
-                                    ]      
-                                },
-                                {
-                                    "title":"University of the West Indies",
-                                    "image_url":"https://sta.uwi.edu/newspics/2020/Regional%20crest%20INtranet.jpg",
-                                    "subtitle":"UWI",
-                                    "default_action": {
-                                        "type": "postback",
-                                        "payload": "matchUWI",
-                                        "messenger_extensions": False,
-                                        "webview_height_ratio": "COMPACT"
+                                    {
+                                        "type":"postback",
+                                        "title":"Scholarship Form",
+                                        "payload":"3"
                                     },
-                                    "buttons":[
-                                        {
-                                            "type":"web_url",
-                                            "url":"https://www.mona.uwi.edu/osf/scholarships-bursaries",
-                                            "title":"Full Listing"
-                                        },
-                                        {
-                                            "type": "postback",
-                                            "title": "Find your match",
-                                            "payload": "matchUWI"
-                                        }
-                                    ]     
-                                },
-                                {
-                                    "title":"Other",
-                                    "image_url":"https://s3-ap-southeast-2.amazonaws.com/geg-web/public/images/300x200/1596434755-unimelb.png",
-                                    "subtitle":"Jamaica",
-                                    "default_action": {
-                                        "type": "postback",
-                                        "payload": "matchAny",
-                                        "messenger_extensions": False,
-                                        "webview_height_ratio": "COMPACT"
+                                    {
+                                        "type":"postback",
+                                        "title":"Find your match",
+                                        "payload":"4"
+                                    }              
+                                ]      
+                            },
+                            {
+                                "title":"University of the West Indies",
+                                "image_url":"https://sta.uwi.edu/newspics/2020/Regional%20crest%20INtranet.jpg",
+                                "subtitle":"UWI",
+                                "buttons":[
+                                    {
+                                        "type":"web_url",
+                                        "url":"https://www.mona.uwi.edu/osf/scholarships-bursaries",
+                                        "title":"Full Listing",
+                                        "webview_height_ratio": "full",
+                                        "messenger_extensions": "true",  
+                                        "fallback_url": "https://www.mona.uwi.edu/osf/scholarships-bursaries"
                                     },
-                                    "buttons":[
-                                        {
-                                            "type": "postback",
-                                            "title": "Find your match",
-                                            "payload": "matchAny"
-                                        }
-                                    ]       
-                                }
-                            ],
-                        }
+                                    {
+                                        "type":"postback",
+                                        "title":"Scholarship Form",
+                                        "payload":"5"
+                                    },
+                                    {
+                                        "type":"postback",
+                                        "title":"Find your match",
+                                        "payload":"6"
+                                    }              
+                                ]      
+                            },
+                            {
+                                "title":"Other",
+                                "image_url":"https://s3-ap-southeast-2.amazonaws.com/geg-web/public/images/300x200/1596434755-unimelb.png",
+                                "subtitle":"Jamaica",
+                                "buttons":[
+                                    {
+                                        "type":"postback",
+                                        "title":"Find your match",
+                                        "payload":"6"
+                                    }              
+                                ]      
+                            }                            
+                        ]
                     }
                 }
+            }
 
-    if 'text' in received_message:
+        elif (payload == buttons[0]['payload']):
+            specialNeeds = received_message['text']
+            response = {
+                "text": "Let's get this show on the road!"
+            }
+            callSendAPI(sender_psid, response)
+            response = "What year are you in ?" 
+            response = postback_button_response(response, buttons[1]['payload'], buttons[1]['YEARS'])
+
+        callSendAPI(sender_psid, response)
+        return
+
+    elif('attachment' in received_message.keys()):
+        atPayload = received_message['attachment']['payload']
+        if('generic' in atPayload['template_type']):
+            if 'postback' in atPayload['elements']['buttons']['type']:
+                payload = atPayload['elements']['buttons']['payload']
+                response = "Can we get some information about your Major ?"
+                response = postback_button_response(response, buttons[2]['payload'], buttons[2]['MAJORS'])
+                callSendAPI(sender_psid, response)
+                
+
+    elif 'text' in received_message.keys():
         messaging_text = received_message['text']
         if messaging_text in GREETINGS:
-            firstName = getFirstName(sender_psid)
-            response = "Welcome to Scholarly" + firstName +". Where the scholarships island wide are placed in a easy to access way for all university students."
-            response2 = "Please Select your year."  
-            bot.send_text_message(sender_psid, response2)
-            postback_button_response(response2, , YEARS)
+            try:
+                firstName = retrieve_user_information(sender_psid)['first_name']
+            except:
+                firstName = ''
+            response = "Hey " + firstName + ", I'm Scholly your assistant bot for today."
             response = {
-                "text": response2
+                "text": response
             }
-            callSendAPI(sender_psid, response2)
-        if messaging_text in YEARS:
-            year = messaging_text 
-            response = "Excellect !"
-            bot.send_text_message(sender_psid, response)
-            response = "Major ?."
-            callSendAPI_QuickReplyDegree(sender_psid, response, )
-        if messaging_text in MAJORS:
-            major = messaging_text
-            response = "That's amazing ! 1's and 0's are the way of life !"
-            bot.send_text_message(sender_psid, response)
-            response2 = "Institution ?"
-            callSendAPI_QuickReplySch(sender_psid, response2)
-        if 'UTECH' in messaging_text:
-            response = "Thank you.. Please give us a sec"
-            callSendAPI_TextMessage(sender_psid, response)
-            response = "Computing results..."
-            callSendAPI_TextMessage(sender_psid, response)
+            callSendAPI(sender_psid, response)
+            response = "Welcome to Scholarly, where the scholarships island wide are placed in a easy to access way for all university students." 
+            response = {
+                "text": response
+            }
+            callSendAPI(sender_psid, response)
+            response = {
+                "text": "First we will need to know a little about you."
+            }
+            callSendAPI(sender_psid, response)
+            response = "Are you a special needs student ?"
+            response = postback_button_response(response, buttons[0]['payload'], buttons[0]['response'])
+            callSendAPI(sender_psid, response)
+
 
 def postback_button_response(text, payload, titles):
     quick_replies = []
@@ -222,67 +247,40 @@ def callSendAPI(sender_psid, response):
     else:
         print('Success!')
 
-# Sends response quick reply messages via the Send API
-def callSendAPI_QuickReply(sender_psid, response, ):
-    headers = {"Content-Type": "application/json"}
-    data = json.dumps({
-        "recipient": {
-            "id": sender_psid
-        },
-        "messaging_type": "RESPONSE",
-        "message": {
-            "text": response,
-            "quick_replies":[
-            {
-                    "content_type":"text",
-                    "title":"Year 1",
-                    "payload":"year1",
-                },
-                {
-                    "content_type":"text",
-                    "title":"Year 2",
-                    "payload":"year2",                      
-                },
-                {
-                    "content_type":"text",
-                    "title":"Year 3",
-                    "payload":"year3",
-                },
-                {
-                    "content_type":"text",
-                    "title":"Final Year",
-                    "payload":"final",
-                }
-            ]
-        }
-    })
-    r = requests.post("https://graph.facebook.com/v7.0/me/messages?access_token="+ PAGE_ACCESS_TOKEN, headers=headers, data=data)
-
-    if r.status_code != 200:
-        print(r.status_code)
-        print(r.text)
-
 
 def handlePostback(sender_psid, received_postback):
-    test = "thanks for being here"
+    if("postback" in received_postback):
+        payload = received_postback["postback"]
+        if (payload == '3'):
+            response = {
+                "text": "https://www.surveymonkey.com/r/UTECHScholarshipApplication"
+            }
+            callSendAPI(sender_psid, response)
+
+        if (payload == '5'):
+            response = {
+                "text": "https://www.mona.uwi.edu/osf/sites/default/files/osf/scholarship_bursary_application_form_2020_2021.pdf"
+            }
+            callSendAPI(sender_psid, response)
 
 
-@app.route('/', methods=['GET'])
-def getFirstName(sender_id):
-    
-    params = {
-        ("fields", "first_name"),
-        ("access_token", PAGE_ACCESS_TOKEN)
-    }
-    headers = {
-        "Content-Type": "application/json"
-    }
-    r = requests.get("https://graph.facebook.com/"+sender_id, params=params, headers=headers)
-    if r.status_code != 200:
-        log(r.status_code)
-    log(r.text)
-    return r.text
+def retrieve_user_information(sender_psid):
+    try:
+        # Send the HTTP request to the Messenger Platform
+        response = requests.get("https://graph.facebook.com/{}?fields=first_name,last_name,profile_pic&access_token={}".format(sender_psid, PAGE_ACCESS_TOKEN))
 
+        # If the response was successful, no Exception will be raised
+        #response.raise_for_status()
+
+        return json.loads(response.content)
+    except requests.HTTPError as http_err:
+        pass
+        print(f'HTTP error occurred: {http_err}')  # Python 3.6
+    except Exception as err:
+        print(f'Other error occurred: {err}')  # Python 3.6
+        pass
+    else:
+        print('Success!')
 
 def log(message):
     print(message)
