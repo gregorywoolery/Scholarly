@@ -3,6 +3,7 @@ import json
 from flask import Flask, request
 import requests
 from pymessenger import Bot
+from student import Student
 
 app = Flask(__name__)
 
@@ -25,8 +26,16 @@ buttons = [
     {
         'MAJORS':["Computer Science", "Social Sciences", "Medicine", "Any"],
         'payload': '2'
+    },
+    {
+        'response': ["Yes, please continue", "No, I'm good"],
+        'payload': '7'
     }
 ]
+
+student = Student("No", "Any", "Any", "Any")
+
+
 
 @app.route('/', methods=['GET'])
 def verify():
@@ -82,7 +91,7 @@ def handleMessage(sender_psid, received_message):
         payload = received_message['quick_reply']['payload']
         response_message = received_message['text']
         if (payload == buttons[1]['payload']):
-            years = received_message
+            student.years = received_message
             response = {
                 "text": "That's great. We have a few listings here.."
             }
@@ -151,7 +160,7 @@ def handleMessage(sender_psid, received_message):
                                     {
                                         "type":"postback",
                                         "title":"Find your match",
-                                        "payload":"6"
+                                        "payload":"8"
                                     }              
                                 ]      
                             }                            
@@ -161,7 +170,7 @@ def handleMessage(sender_psid, received_message):
             }
 
         elif (payload == buttons[0]['payload']):
-            specialNeeds = received_message['text']
+            student.specialNeeds = received_message['text']
             response = {
                 "text": "Let's get this show on the road!"
             }
@@ -169,18 +178,29 @@ def handleMessage(sender_psid, received_message):
             response = "What year are you in ?" 
             response = postback_button_response(response, buttons[1]['payload'], buttons[1]['YEARS'])
 
-        callSendAPI(sender_psid, response)
-        return
+        elif(payload == buttons[2]['payload']):
+            student.major = response_message
+            response = {
+                "text": "Getting your results.. Give me a sec."
+            }
+            callSendAPI(sender_psid, response)
+            getResults(sender_psid)
 
-    elif('attachment' in received_message.keys()):
-        atPayload = received_message['attachment']['payload']
-        if('generic' in atPayload['template_type']):
-            if 'postback' in atPayload['elements']['buttons']['type']:
-                payload = atPayload['elements']['buttons']['payload']
-                response = "Can we get some information about your Major ?"
-                response = postback_button_response(response, buttons[2]['payload'], buttons[2]['MAJORS'])
+        elif(payload == buttons[3]['payload']):
+            if ('Yes' in response_message):
+                response = getMajor(sender_psid)
+            elif('No' in response_message):
+                response = "Sorry to see you leave us so soon, but thanks for your time. Hope your with us again." 
+                response = {
+                    "text": response
+                }
                 callSendAPI(sender_psid, response)
-                
+                response = {
+                    "text": "Scholly out."
+                }
+        if(payload != buttons[2]['payload']):
+            callSendAPI(sender_psid, response)
+            return
 
     elif 'text' in received_message.keys():
         messaging_text = received_message['text']
@@ -206,7 +226,6 @@ def handleMessage(sender_psid, received_message):
             response = "Are you a special needs student ?"
             response = postback_button_response(response, buttons[0]['payload'], buttons[0]['response'])
             callSendAPI(sender_psid, response)
-
 
 def postback_button_response(text, payload, titles):
     quick_replies = []
@@ -247,21 +266,113 @@ def callSendAPI(sender_psid, response):
     else:
         print('Success!')
 
-
 def handlePostback(sender_psid, received_postback):
-    if("postback" in received_postback):
-        payload = received_postback["postback"]
-        if (payload == '3'):
-            response = {
-                "text": "https://www.surveymonkey.com/r/UTECHScholarshipApplication"
-            }
-            callSendAPI(sender_psid, response)
+    #if("postback" in received_postback):
+    payload = received_postback["payload"]
+    if (payload == '3'):
+        student.school = "Utech"
+        response = {
+            "text": "https://www.surveymonkey.com/r/UTECHScholarshipApplication"
+        }
+        callSendAPI(sender_psid, response)
 
-        if (payload == '5'):
+    elif (payload == '5'):
+        student.school = "UWI"
+        response = {
+            "text": "https://www.mona.uwi.edu/osf/sites/default/files/osf/scholarship_bursary_application_form_2020_2021.pdf"
+        }
+        print(student.school)
+        callSendAPI(sender_psid, response)
+
+    
+    if(payload == '3' or payload == '5'):
+        response = "Do you want continue ?"
+        response = postback_button_response(response, buttons[3]['payload'], buttons[3]['response'])
+        callSendAPI(sender_psid, response)
+    
+    elif(payload == '4' or payload == '6' or payload == '8'):
+        if(payload == '4'):
+            student.school = "Utech"
+        elif(payload == '6'):
+            student.school = "UWI"
+        elif(payload == '8'):
+            student.school = "Any"
+
+        response = getMajor(sender_psid)
+        callSendAPI(sender_psid, response)
+
+def getMajor(sender_psid):
+    response = {
+        "text": "Great I just need one more piece of info."
+    }
+    callSendAPI(sender_psid, response)
+    response = "What is your current major ?"
+    response = postback_button_response(response, buttons[2]['payload'], buttons[2]['MAJORS'])
+    return response
+
+def getResults(sender_psid):
+    response = {}
+    print(student.school)
+    print(student.major)
+    if("UWI" in student.school):
+        if("Social Sciences" in student.major):
             response = {
-                "text": "https://www.mona.uwi.edu/osf/sites/default/files/osf/scholarship_bursary_application_form_2020_2021.pdf"
+                "attachment": {
+                    "type":"template",
+                    "payload": {
+                        "template_type":"generic",
+                        "elements":[
+                            {
+                                "title":"AFUWI SCHOLARSHIPS",
+                                "image_url":"https://sta.uwi.edu/newspics/2020/Regional%20crest%20INtranet.jpg",
+                                "subtitle":"Value: US$ 2,000-5000, One (1) year",
+                                "buttons":[
+                                    {
+                                        "type":"web_url",
+                                        "url":"https://www.mona.uwi.edu/osf/scholarships/afuwi-scholarships-0#overlay=node/914/edit&overlay-context=scholarships-bursaries",
+                                        "title":"View",
+                                        "webview_height_ratio": "full",
+                                        "messenger_extensions": "true",  
+                                        "fallback_url": "https://www.mona.uwi.edu/osf/scholarships/afuwi-scholarships-0#overlay=node/914/edit&overlay-context=scholarships-bursaries"
+                                    }              
+                                ]      
+                            },
+                            {
+                                "title":"AMBASSADOR J. GARY COOPER BURSARY",
+                                "image_url":"https://sta.uwi.edu/newspics/2020/Regional%20crest%20INtranet.jpg",
+                                "subtitle":"Value: J$120,000.00, One (1) year",
+                                "buttons":[
+                                    {
+                                        "type":"web_url",
+                                        "url":"https://www.mona.uwi.edu/osf/scholarships/ambassador-j-gary-cooper-bursary-0#overlay-context=scholarships-bursaries",
+                                        "title":"View",
+                                        "webview_height_ratio": "full",
+                                        "messenger_extensions": "true",  
+                                        "fallback_url": "https://www.mona.uwi.edu/osf/scholarships/ambassador-j-gary-cooper-bursary-0#overlay-context=scholarships-bursaries"
+                                    }              
+                                ]      
+                            },
+                            {
+                                "title":"OFFICE OF STUDENT FINANCING SCHOLARSHIP",
+                                "image_url":"https://sta.uwi.edu/newspics/2020/Regional%20crest%20INtranet.jpg",
+                                "subtitle":"Value: J$150,000.00, One (1) year",
+                                "buttons":[
+                                    {
+                                        "type":"web_url",
+                                        "url":"https://www.mona.uwi.edu/osf/scholarships/office-student-financing-scholarship-0#overlay-context=scholarships-bursaries",
+                                        "title":"View",
+                                        "webview_height_ratio": "full",
+                                        "messenger_extensions": "true",  
+                                        "fallback_url": "https://www.mona.uwi.edu/osf/scholarships/office-student-financing-scholarship-0#overlay-context=scholarships-bursaries"
+                                    }              
+                                ]      
+                            }                            
+                        ]
+                    }
+                }
             }
-            callSendAPI(sender_psid, response)
+
+            callSendAPI(sender_psid, response)            
 
 
 def retrieve_user_information(sender_psid):
@@ -285,7 +396,6 @@ def retrieve_user_information(sender_psid):
 def log(message):
     print(message)
     sys.stdout.flush()
-
 
 if __name__ == "__main__":
     app.run(debug = True, port = 80)
