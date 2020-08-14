@@ -12,7 +12,8 @@ bot = Bot(PAGE_ACCESS_TOKEN)
 
 VERIFICATION_TOKEN = "Sl33pyW00ly"
 
-GREETINGS = ['Is anyone available to chat?', 'Hey', 'hey', 'Hi', 'hi', 'hello', 'Hello', 'good afternoon', 'i have a question']
+GREETINGS = ['Is anyone available to chat?','Hi, i need some help' ,'Hey', 'hey', 'Hi', 'hi', 'hello', 'Hello', 'good afternoon', 'i have a question']
+FAREWELL = ['goodbye', 'bye', "Thanks for the info", 'Bless', 'thank you', 'Thank you']
 
 buttons = [
     {
@@ -33,8 +34,137 @@ buttons = [
     }
 ]
 
-student = Student("No", "Any", "Any", "Any")
+UWI = [
+    [ #SOCIAL SCIENCES
+        {
+            'title': "AFUWI SCHOLARSHIPS",
+            'subtitle': "Value: US$ 2,000-5000, One (1) year",
+            'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/afuwi-scholarships-0#overlay=node/914/edit&overlay-context=scholarships-bursaries"
+        },
+        {
+            'title': "AMBASSADOR J. GARY COOPER BURSARY",
+            'subtitle': "Value: J$120,000.00, One (1) year",
+            'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/ambassador-j-gary-cooper-bursary-0#overlay-context=scholarships-bursaries"
+        },
+        {
+            'title': "OFFICE OF STUDENT FINANCING SCHOLARSHIP",
+            'subtitle': "Value: J$150,000.00, One (1) year",
+            'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/office-student-financing-scholarship-0#overlay-context=scholarships-bursaries"
+        }
+    ],
+    [ #COMPUTER SCIENCE
+        {
+            'title': "NCB Software Engineering Scholarship",
+            'subtitle': "Value: US $5,000.00, Four (4) years",
+            'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/ncb-software-engineering-scholarship"
+        },
+        {
+            'title': "DIGICEL SCHOLARSHIPS",
+            'subtitle': "Value: J$145,000.00, One (1) year",
+            'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/digicel-scholarships-0"
+        },
+        {
+            'title': "JOE PEREIRA SCHOLARSHIP (THE)",
+            'subtitle': "Value: J $250,000.00, One (1) year",
+            'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/joe-pereira-scholarship-1#overlay-context=scholarships-bursaries"
+        }
+    ],
+    [ #MEDICINE
+        {
+            'title': "Dr. Denise Mitchell- Thwaites Scholarship",
+            'subtitle': "J $ 2 million per year, One (1) year",
+            'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/dr-denise-mitchell-thwaites-scholarship-0"
+        },
+        {
+            'title': "IGL RAZAI AZARD RAHAMAN SCHOLARSHIP FOR MEDICINE",
+            'subtitle': "Value: J$120,000.00, One (1) year",
+            'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/igl-razai-azard-rahaman-scholarship-medicine-0#overlay-context=scholarships-bursaries"
+        },
+        {
+            'title': "OFFICE OF STUDENT FINANCING SCHOLARSHIP",
+            'subtitle': "Value: J$650,000.00, Fine (5) year",
+            'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/office-student-financing-scholarship-0#overlay-context=scholarships-bursaries"
+        }
+    ]
+]
 
+Utech = [
+    [
+        {
+            "title": "Carreras Seek",
+            "subtitle": "3.0 GPA"
+        },
+        {
+            "title": "Jamaica Bauxite Mining Limited (Glencore)",
+            "subtitle": "Resides in a bauxite parishes"
+        },
+        {
+            "title": "Joan Duncan Trust",
+            "subtitle": "Joan Duncan School of Entrepreneurship, Ethics & Leadership"       
+        }
+    ],
+    [
+        {
+            "title": "Grace Kennedy Foundation (Douglas Orane)",
+            "subtitle": "Faculty of Engineering & Computing"
+        },
+        {
+            "title": "Gregory Vassell Memorial",
+            "subtitle": "Atleast 3.0 GPA"
+        },
+        {
+            "title": "Students’ Union Faculty of Engineering & Computing",
+            "subtitle": "at least a B- average"
+        }
+    ],
+    [
+        {
+            "title": "Mona (Hurd) Style",
+            "subtitle": "Pharmaceutical Technology"
+        },
+        {
+            "title": "Carol A. Lewis (Ivy M. Ellis)",
+            "subtitle": "Health Records & Statistics. College of Health Sciences"
+        },
+        {
+            "title": "UTech Foundation (Mable Tenn)",
+            "subtitle": "3rd year Pharmacy, College of Health Sciences"       
+        }
+    ]
+]
+
+Any = [
+    {
+        'title': "Bernie & Ramona Benson",
+        'subtitle': "1st year of All Schools"
+    },
+    {
+        'title': "Chinese Ambassador",
+        'subtitle': "all Schools"
+    },
+    {
+        'title': "Guild Part Time Assistance (P.T.A) Grant",
+        'subtitle': "Value: J $150,000.00, One (1) year",
+        'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/guild-part-time-assistance-pta-grant" 
+    },
+    {
+        'title': "Advent Fellowship Scholarship",
+        'subtitle': "Value: JMD $100,000, One (1) year",
+        'buttonUrl': "https://www.mona.uwi.edu/osf/scholarships/advent-fellowship-scholarship"
+    }
+]
+
+imgUrl = [
+    {
+        'imageUrl': "https://www.utech.edu.jm/about-utech/utech.jpg"
+    },
+    {
+        'imageUrl':"https://sta.uwi.edu/newspics/2020/Regional%20crest%20INtranet.jpg"
+    }
+]
+
+
+student = Student("No", "Any", "Any", "Any")
 
 
 @app.route('/', methods=['GET'])
@@ -44,9 +174,9 @@ def verify():
         if not request.args.get("hub.verify_token") == VERIFICATION_TOKEN:
             return "Verification token mismatch", 403
         return request.args["hub.challenge"], 200
-    return "WEBHOOK VERIFIED", 200
     getstarted()
-
+    return "WEBHOOK VERIFIED", 200
+    
 def getstarted():
     headers = {'Content-Type': 'application/json'}
     data = json.dumps({
@@ -56,6 +186,30 @@ def getstarted():
     })
 
     r = requests.post('https://graph.facebook.com/v7.0/me/messenger_profile?access_token='+ PAGE_ACCESS_TOKEN, headers=headers, data=data)
+    greetingText()
+
+def greetingText():
+    headers = {"Content-Type": "application/json"}
+    data = json.dumps({
+        "greeting": [{
+            "locale":"default",
+            "text":"Let' get this bag ! I mean scholarships." 
+            }
+        ]
+    })
+
+    try:
+        r = requests.post("https://graph.facebook.com/v7.0/me/messages?access_token="+ PAGE_ACCESS_TOKEN, headers=headers, data=data)
+        print (r.text)
+        r.raise_for_status()
+    except requests.HTTPError as http_err:
+        print(f'HTTP error occurred: {http_err}')  # Python 3.6
+        pass
+    except Exception as err:
+        print(f'Other error occurred: {err}')  # Python 3.6
+        pass
+    else:
+        print('Success!')
 
 @app.route('/', methods=['POST'])
 def webhook():
@@ -122,7 +276,7 @@ def handleMessage(sender_psid, received_message):
                                     },
                                     {
                                         "type":"postback",
-                                        "title":"Find your match",
+                                        "title":"Continue",
                                         "payload":"4"
                                     }              
                                 ]      
@@ -147,23 +301,11 @@ def handleMessage(sender_psid, received_message):
                                     },
                                     {
                                         "type":"postback",
-                                        "title":"Find your match",
+                                        "title":"Continue",
                                         "payload":"6"
                                     }              
                                 ]      
-                            },
-                            {
-                                "title":"Other",
-                                "image_url":"https://s3-ap-southeast-2.amazonaws.com/geg-web/public/images/300x200/1596434755-unimelb.png",
-                                "subtitle":"Jamaica",
-                                "buttons":[
-                                    {
-                                        "type":"postback",
-                                        "title":"Find your match",
-                                        "payload":"8"
-                                    }              
-                                ]      
-                            }                            
+                            }
                         ]
                     }
                 }
@@ -185,6 +327,13 @@ def handleMessage(sender_psid, received_message):
             }
             callSendAPI(sender_psid, response)
             getResults(sender_psid)
+            response = {
+                "text": "This is all we have for you right now. Please feel free to restart the conversation at any time."
+            }
+            callSendAPI(sender_psid, response)
+            response = {
+                "text": "Scholly out."
+            }
 
         elif(payload == buttons[3]['payload']):
             if ('Yes' in response_message):
@@ -198,9 +347,9 @@ def handleMessage(sender_psid, received_message):
                 response = {
                     "text": "Scholly out."
                 }
-        if(payload != buttons[2]['payload']):
-            callSendAPI(sender_psid, response)
-            return
+
+        callSendAPI(sender_psid, response)
+        return
 
     elif 'text' in received_message.keys():
         messaging_text = received_message['text']
@@ -214,7 +363,7 @@ def handleMessage(sender_psid, received_message):
                 "text": response
             }
             callSendAPI(sender_psid, response)
-            response = "Welcome to Scholarly, where the scholarships island wide are placed in a easy to access way for all university students." 
+            response = "Welcome to Scholarly, where scholarships islandwide are placed in an easy to access way for all university students." 
             response = {
                 "text": response
             }
@@ -241,6 +390,28 @@ def postback_button_response(text, payload, titles):
         'quick_replies': quick_replies
     }
 
+def typingSenderAction(sender_psid):
+    headers = {"Content-Type": "application/json"}
+    data = json.dumps(
+        {"recipient": {
+            "id": sender_psid
+            },
+            "sender_action":"typing_on"
+        })
+
+    try:
+        r = requests.post("https://graph.facebook.com/v7.0/me/messages?access_token="+ PAGE_ACCESS_TOKEN, headers=headers, data=data)
+        print (r.text)
+        r.raise_for_status()
+    except requests.HTTPError as http_err:
+        print(f'HTTP error occurred: {http_err}')  # Python 3.6
+        pass
+    except Exception as err:
+        print(f'Other error occurred: {err}')  # Python 3.6
+        pass
+    else:
+        print('Success!')
+
 # Sends response messages via the Send API
 def callSendAPI(sender_psid, response):
     headers = {"Content-Type": "application/json"}
@@ -253,10 +424,11 @@ def callSendAPI(sender_psid, response):
         })
 
     try:
+        typingSenderAction(sender_psid)
         r = requests.post("https://graph.facebook.com/v7.0/me/messages?access_token="+ PAGE_ACCESS_TOKEN, headers=headers, data=data)
         print (r.text)
         # If the response was successful, no Exception will be raised
-        response.raise_for_status()
+        r.raise_for_status()
     except requests.HTTPError as http_err:
         print(f'HTTP error occurred: {http_err}')  # Python 3.6
         pass
@@ -281,7 +453,7 @@ def handlePostback(sender_psid, received_postback):
         response = {
             "text": "https://www.mona.uwi.edu/osf/sites/default/files/osf/scholarship_bursary_application_form_2020_2021.pdf"
         }
-        print(student.school)
+        #print(student.school)
         callSendAPI(sender_psid, response)
 
     
@@ -290,13 +462,11 @@ def handlePostback(sender_psid, received_postback):
         response = postback_button_response(response, buttons[3]['payload'], buttons[3]['response'])
         callSendAPI(sender_psid, response)
     
-    elif(payload == '4' or payload == '6' or payload == '8'):
+    elif(payload == '4' or payload == '6'):
         if(payload == '4'):
             student.school = "Utech"
         elif(payload == '6'):
             student.school = "UWI"
-        elif(payload == '8'):
-            student.school = "Any"
 
         response = getMajor(sender_psid)
         callSendAPI(sender_psid, response)
@@ -312,68 +482,74 @@ def getMajor(sender_psid):
 
 def getResults(sender_psid):
     response = {}
+    elements = []
+    
     print(student.school)
     print(student.major)
+
     if("UWI" in student.school):
+        title = "View"
         if("Social Sciences" in student.major):
-            response = {
-                "attachment": {
-                    "type":"template",
-                    "payload": {
-                        "template_type":"generic",
-                        "elements":[
-                            {
-                                "title":"AFUWI SCHOLARSHIPS",
-                                "image_url":"https://sta.uwi.edu/newspics/2020/Regional%20crest%20INtranet.jpg",
-                                "subtitle":"Value: US$ 2,000-5000, One (1) year",
-                                "buttons":[
-                                    {
-                                        "type":"web_url",
-                                        "url":"https://www.mona.uwi.edu/osf/scholarships/afuwi-scholarships-0#overlay=node/914/edit&overlay-context=scholarships-bursaries",
-                                        "title":"View",
-                                        "webview_height_ratio": "full",
-                                        "messenger_extensions": "true",  
-                                        "fallback_url": "https://www.mona.uwi.edu/osf/scholarships/afuwi-scholarships-0#overlay=node/914/edit&overlay-context=scholarships-bursaries"
-                                    }              
-                                ]      
-                            },
-                            {
-                                "title":"AMBASSADOR J. GARY COOPER BURSARY",
-                                "image_url":"https://sta.uwi.edu/newspics/2020/Regional%20crest%20INtranet.jpg",
-                                "subtitle":"Value: J$120,000.00, One (1) year",
-                                "buttons":[
-                                    {
-                                        "type":"web_url",
-                                        "url":"https://www.mona.uwi.edu/osf/scholarships/ambassador-j-gary-cooper-bursary-0#overlay-context=scholarships-bursaries",
-                                        "title":"View",
-                                        "webview_height_ratio": "full",
-                                        "messenger_extensions": "true",  
-                                        "fallback_url": "https://www.mona.uwi.edu/osf/scholarships/ambassador-j-gary-cooper-bursary-0#overlay-context=scholarships-bursaries"
-                                    }              
-                                ]      
-                            },
-                            {
-                                "title":"OFFICE OF STUDENT FINANCING SCHOLARSHIP",
-                                "image_url":"https://sta.uwi.edu/newspics/2020/Regional%20crest%20INtranet.jpg",
-                                "subtitle":"Value: J$150,000.00, One (1) year",
-                                "buttons":[
-                                    {
-                                        "type":"web_url",
-                                        "url":"https://www.mona.uwi.edu/osf/scholarships/office-student-financing-scholarship-0#overlay-context=scholarships-bursaries",
-                                        "title":"View",
-                                        "webview_height_ratio": "full",
-                                        "messenger_extensions": "true",  
-                                        "fallback_url": "https://www.mona.uwi.edu/osf/scholarships/office-student-financing-scholarship-0#overlay-context=scholarships-bursaries"
-                                    }              
-                                ]      
-                            }                            
-                        ]
-                    }
-                }
+            schList = UWI[0]
+
+        if("Computer Science" in student.major):
+            schList = UWI[1]
+        
+        if("Medicine" in student.major):
+            schList = UWI[2]
+            
+    elif("Utech" in student.school):
+        title = "See Application"
+        if("Social Sciences" in student.major):
+            schList = Utech[0]
+
+        if("Computer Science" in student.major):
+            schList = Utech[1]
+        
+        if("Medicine" in student.major):
+            schList = Utech[2]        
+
+    if("Any" in student.major):
+        schList = Any
+
+
+    for sch in schList:
+        if('buttonUrl' in sch.keys()): #if UWI
+            url = sch['buttonUrl']
+            img = imgUrl[1]['imageUrl']
+            title = "View"
+        else: #if UTECH
+            url = "https://www.surveymonkey.com/r/UTECHScholarshipApplication"
+            img = imgUrl[0]['imageUrl']
+            title = "Application Form"
+
+        elements.append({
+            "title":sch['title'],
+            "image_url": img,
+            "subtitle":sch['subtitle'],
+            "buttons":[
+                {
+                    "type":"web_url",
+                    "url": url,
+                    "title":title,
+                    "webview_height_ratio": "full",
+                    "messenger_extensions": "true",  
+                    "fallback_url": url
+                }              
+            ]  
+        })
+
+    response = {
+        "attachment": {
+            "type":"template",
+            "payload": {
+                "template_type":"generic",
+                "elements": elements
             }
+        }
+    }
 
-            callSendAPI(sender_psid, response)            
-
+    callSendAPI(sender_psid, response)            
 
 def retrieve_user_information(sender_psid):
     try:
