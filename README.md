@@ -3,7 +3,6 @@
 [//]: <> (Please use this Winning Hackathon Application as an example:
 https://devpost.com/software/rewise-ai-powered-revision-bot)
 
-**Team Members**: Gregory Woolery, Alecia Bailey, Sanjae Smith, Shaquan Robinson, Robbyn Brown
 
 ## Inspiration
 The inspiration behind Scholarly came from the tedious process that hopeful applicants go through yearly to find a scholarship. More often than not, the applicant will have to manually filter out which scholarships they can apply for based on a certain criteria. 
